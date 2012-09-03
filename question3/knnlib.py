@@ -30,10 +30,10 @@ class KNN(object):
 		self.ranking_vector = zeros(min(self.num_songs,NUM_PICK))
 			
 	def _find_similarity_measures(self):
-		for y in range(0, self.num_users): 
-				self.similarities[y] = self.__similarity_measure(self.query_user_features,
-																 self.user_data[y])
-		self.smilarities[self.query_id] = -1		
+		for y in range(0, self.num_users):
+			self.similarities.append(self.__similarity_measure(self.query_user_features,
+															 self.user_data[y]))
+		self.similarities[self.query_id] = -1		
 				
 	def _find_k_NN(self):
 		top_k = []
@@ -44,20 +44,20 @@ class KNN(object):
 					heappop(top_k)
 				self.k_NN = map(lambda (similarity, user_ind):user_ind, top_k)
 	
-	def _find_unweighted_ranking_vectors(self):
+	def _find_unweighted_ranking_vector(self):
 		v = zeros(self.num_songs)
 		for i in range(0, self.k):
-			v = v+ self.user_data[int(self.NN_matrix[row][i])]
+			v = v+ self.user_data[int(self.k_NN[i])]
 		raw = list(v / self.k)		# average play freq vector for songs
 		print raw
 		self.ranking_vector = map(lambda x: raw.index(x), nlargest(NUM_PICK, raw))
 	
 	
-	def _find_weighted_ranking_vectors(self):
+	def _find_weighted_ranking_vector(self):
 		v = zeros(self.num_songs)
 		for i in range(0, self.k):
-			v = v+ self.user_data[int(self.NN_matrix[row][i])] * self.similarity_matrix[row,i] 
-		raw = list(v / sum(self.similarity_matrix[row][:k]))
+			v = v+ self.user_data[int(self.k_NN_[i])] * self.similarities[i] 
+		raw = list(v / sum(self.similarities[:k]))
 		self.ranking_vector = map(lambda x: raw.index(x), nlargest(NUM_PICK, raw))
 
 	def print_attr(self):
@@ -67,7 +67,7 @@ class KNN(object):
 		print "k_NN:"
 		print self.k_NN
 		print "ranking_vectors:"
-		print self.ranking_vectors
+		print self.ranking_vector
 		print"++++++++++++++++++++++++++++++++++++"
 		
 	def run(self):
@@ -75,11 +75,11 @@ class KNN(object):
 		self.print_attr()
 		self._find_similarity_measures()
 		self.print_attr()
-		self._find_NN_matrix()
+		self._find_k_NN()
 		self.print_attr()
 		if self.weighted:
-			self._find_weighted_ranking_vectors()
+			self._find_weighted_ranking_vector()
 		else:
-			self._find_unweighted_ranking_vectors()
+			self._find_unweighted_ranking_vector()
 		self.print_attr()
-		return self.ranking_vectors
+		return self.ranking_vector

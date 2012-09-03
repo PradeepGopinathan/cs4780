@@ -12,5 +12,5 @@ for i in range(0,6):
 k = 1
 weighted = False
 similarity_metric = "dot_product"
-knntool = KNN(k, weighted, similarity_metric, user_data)
+knntool = KNN(k, weighted, similarity_metric, user_data,(0,user_data[0]))
 print knntool.run()
