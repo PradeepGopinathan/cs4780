@@ -1,4 +1,5 @@
 #/usr/bin/python2.7.3
+from __future__ import division
 
 import os
 import exceptions
@@ -17,6 +18,7 @@ class DataTool(object):
 		self.__import_song_mappings(song_mapping)
 		self.__import_train_data(user_train)
 		self.__import_test_data(test_data)
+
 
 	def __import_song_mappings(self,filename):
 		with open(filename,"r") as f:
@@ -58,13 +60,13 @@ class DataTool(object):
 		for i in range(0, self.num_songs):
 			if artist in self.song_info[i]:
 				collection.append(i+1)
-		return collection
+		return collection # real song id
 		
 	def create_artist_feature(self,song_list):
 		features = zeros(self.num_songs)
 		for song_id in song_list[:NUM_PICK]:
 			features[song_id-1] = 1
-		return features, song_list[:NUM_PICK] 	
+		return features, song_list[:NUM_PICK] 	# real song id for song_list
 		
 	def get_song_info(self, id):
 		return self.song_info[id-1]

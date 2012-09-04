@@ -31,14 +31,6 @@ song_mapping = "../data/song_mapping.txt"
 user_train = "../data/user_train.txt"
 test_data = "../data/user_test.txt"
 
-"""
-k = 100
-weighted = False
-similarity_metric = 1
-
-query_id = 100
-"""
-
 datatool = DataTool(song_mapping, user_train, test_data)
 user_data = datatool.user_data
 
@@ -46,13 +38,15 @@ print "Done with data collection"
 
 def user_query(k, weighted, similarity_metric, user_data,(query_id,query_features),test_data):
 	knntool = KNN(k, weighted, similarity_metric, user_data,(query_id,query_features))
-	recommended_songs =  knntool.run()	
+	recommended_songs =  map(lambda x:x+1, knntool.run()) # translate shifted id to real id 	
 	print recommended_songs	
 	R = 10
 	R_rel = 0
+	print "songs match:"
 	for song in recommended_songs:
 		if song in test_data:
-			R_rel += 1		
+			R_rel += 1
+			print datatool.get_song_info(song)
 	P = R_rel/R	
 	print "P = %f" % P
 
