@@ -11,7 +11,8 @@ for i in range(0,6):
 
 k = 3
 weighted = False
-similarity_metric = "euclidean"
+similarity_metric = 1
 knntool = KNN(k, weighted, similarity_metric, user_data,(0,user_data[0]))
 print knntool.run()
 knntool.print_attr()
+

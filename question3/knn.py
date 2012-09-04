@@ -23,7 +23,6 @@ parser.add_option("-a", "--artist_query", dest="artist", type="string",
 
 k = options.k
 weighted = options.weighted
-print weighted
 similarity_metric = options.similarity_metric
 query_id = options.query_id
 artist = options.artist
@@ -43,29 +42,40 @@ query_id = 100
 datatool = DataTool(song_mapping, user_train, test_data)
 user_data = datatool.user_data
 
-test_data = datatool.test_data[query_id]
-#print test_data
-
 print "Done with data collection"
 
+def user_query(k, weighted, similarity_metric, user_data,(query_id,query_features),test_data):
+	knntool = KNN(k, weighted, similarity_metric, user_data,(query_id,query_features))
+	recommended_songs =  knntool.run()	
+	print recommended_songs	
+	R = 10
+	R_rel = 0
+	for song in recommended_songs:
+		if song in test_data:
+			R_rel += 1		
+	P = R_rel/R	
+	print "P = %f" % P
+
+def artist_query(artist):
+	song_list = datatool.get_artist_collection(artist)
+	query_features, picked_songs = datatool.create_artist_feature(song_list)
+	query_data = (-1, query_features)
+	test_data = filter(lambda x:x not in picked_songs, song_list)
+	user_query(k, weighted, similarity_metric, user_data,query_data,test_data)
+	
 
 print "Start training..."
-knntool = KNN(k, weighted, similarity_metric, user_data,(query_id-1,user_data[query_id-1]))
-recommended_songs =  knntool.run()
 
-print recommended_songs
+# user query
+if query_id is not None:
+	print "User query..."
+	test_data = datatool.test_data[query_id-1]
+	user_query(k, weighted, similarity_metric, user_data, (query_id-1,user_data[query_id-1]),test_data)
 
-
-R = 10
-R_rel = 0
-for song in recommended_songs:
-	if song in test_data:
-		R_rel += 1
-print "R_rel:"
-print R_rel
-P = float(R_rel/R)
-
-print P
+# artist query
+if artist is not None:
+	print "Artist query..."
+	artist_query(artist)
 
 		
 

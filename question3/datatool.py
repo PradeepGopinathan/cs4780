@@ -4,12 +4,16 @@ import os
 import exceptions
 from numpy import *
 
+NUM_PICK = 10
+
 class DataTool(object):
 	
 	def __init__(self, song_mapping, user_train, test_data):
 		self.user_data = []
 		self.song_info = []
 		self.test_data = []
+		self.num_songs = 0
+		self.num_users = 0
 		self.__import_song_mappings(song_mapping)
 		self.__import_train_data(user_train)
 		self.__import_test_data(test_data)
@@ -48,6 +52,19 @@ class DataTool(object):
 			
 	def get_user_data(self, id):
 		return self.user_data[id-1]
+		
+	def get_artist_collection(self,artist):
+		collection = []
+		for i in range(0, self.num_songs):
+			if artist in self.song_info[i]:
+				collection.append(i+1)
+		return collection
+		
+	def create_artist_feature(self,song_list):
+		features = zeros(self.num_songs)
+		for song_id in song_list[:NUM_PICK]:
+			features[song_id-1] = 1
+		return features, song_list[:NUM_PICK] 	
 		
 	def get_song_info(self, id):
 		return self.song_info[id-1]

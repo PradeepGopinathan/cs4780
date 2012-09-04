@@ -5,7 +5,7 @@ NUM_PICK = 10
 
 class KNN(object):
 	
-	def __init__(self, k, weighted, similarity_metric, user_data, query_user):
+	def __init__(self, k, weighted, similarity_metric, user_data, query_user=None):
 		self.k = k
 		self.weighted = weighted
 		self.similarity_metric = similarity_metric
@@ -21,7 +21,7 @@ class KNN(object):
 		elif self.similarity_metric == 2:
 			return dot(x,y)
 		else:
-			return dot(x,y)/(norm(x)*norm(y))
+			return dot(x,y)/(norm(x,2)*norm(y,2))
 	
 	def _reset(self):	
 		self.similarities = []  #initialize everything to be negative
@@ -31,18 +31,15 @@ class KNN(object):
 			
 	def _find_similarity_measures(self):
 		for y in range(0, self.num_users):
-			self.similarities.append(self.__similarity_measure(self.query_user_features,
-															   self.user_data[y]))
-		self.similarities[self.query_id] = -1 #exclude itself in similarity measrure
+			if y == self.query_id:
+				self.similarities.append(-1)
+			else:	
+				self.similarities.append(self.__similarity_measure(self.query_user_features,
+															       self.user_data[y]))
 				
 	def _find_k_NN(self):
-		top_k = []
-		for y in range(0,self.num_users):
-			if not (self.query_id==y):
-				heappush(top_k,(self.similarities[y],y))
-				if len(top_k) > self.k: # to save memory, pop out the smallest one
-					heappop(top_k)
-				self.k_NN = map(lambda (similarity, user_ind):user_ind, top_k)
+		raw = nlargest(self.k,enumerate(self.similarities), key=lambda x: x[1])
+		self.k_NN = map(lambda x: x[0],raw)
 	
 	def _find_unweighted_ranking_vector(self):
 		v = zeros(self.num_songs)
