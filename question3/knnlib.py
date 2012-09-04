@@ -37,12 +37,9 @@ class KNN(object):
 		self.ranking_vector = None
 			
 	def _find_similarity_measures(self):
-		for y in range(0, self.num_users):
-			if y == self.query_id:
-				self.similarities.append(-1)
-			else:	
-				self.similarities.append(self.__similarity_measure(self.query_user_features,
-															       self.user_data[y]))
+		self.similarities = [-1 if y == self.query_id 
+								else self.__similarity_measure(self.query_user_features,self.user_data[y]) 
+								for y in range(0, self.num_users)]
 				
 	def _find_k_NN(self):
 		raw = nlargest(self.k,enumerate(self.similarities), key=lambda x: x[1])

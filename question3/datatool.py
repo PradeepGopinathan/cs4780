@@ -24,19 +24,17 @@ class DataTool(object):
 		with open(filename,"r") as f:
 			total_songs = f.readlines()
 			self.num_songs = len(total_songs)
-			for i in range(0, self.num_songs):
-				self.song_info.append("")
+			self.song_info = ["" for i in range(0, self.num_songs)]
 			for line in total_songs:
 				[song_id, info] = line.strip().split("\t", 1)
 				self.song_info[int(song_id)-1] = info
-
+				
 
 	def __import_train_data(self,filename):
 		with open(filename, "r") as f:
 			total_users = f.readlines()
 			self.num_users = len(total_users)
-			for i in range(0, self.num_users):
-				self.user_data.append([])
+			self.user_data= [[] for i in range(0, self.num_users)]
 			for line in total_users:
 				data = line.strip().split()
 				user_id = int(data[0])
@@ -49,11 +47,12 @@ class DataTool(object):
 				
 	def __import_test_data(self,filename):
 		with open(filename,"r") as f:
-			for line in f.readlines():
-				self.test_data.append(map(lambda x: int(x),line.split("-")[1].strip().split()))
+			self.test_data = [map(lambda x: int(x),line.split("-")[1].strip().split()) for line in f.readlines()]
+			
 			
 	def get_user_data(self, id):
 		return self.user_data[id-1]
+		
 		
 	def get_artist_collection(self,artist):
 		collection = []
@@ -62,11 +61,10 @@ class DataTool(object):
 				collection.append(i+1)
 		return collection # real song id
 		
+		
 	def create_artist_feature(self,song_list):
-		features = zeros(self.num_songs)
-		for song_id in song_list:
-			features[song_id-1] = 1
-		return features
+		return [1 if (i+1) in song_list else 0 for i in range(0, self.num_songs)]
+		
 		
 	def get_song_info(self, id):
 		return self.song_info[id-1]
