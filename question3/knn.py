@@ -1,5 +1,8 @@
+from __future__ import division
+
 import sys
 from optparse import OptionParser
+
 
 from datatool import *
 from knnlib import *
@@ -52,13 +55,17 @@ recommended_songs =  knntool.run()
 
 print recommended_songs
 
+
 R = 10
 R_rel = 0
 for song in recommended_songs:
 	if song in test_data:
 		R_rel += 1
-P = R_rel/R
+print "R_rel:"
+print R_rel
+P = float(R_rel/R)
 
 print P
+
 		
 
