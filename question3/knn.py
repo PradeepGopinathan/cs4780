@@ -36,26 +36,36 @@ user_data = datatool.user_data
 
 print "Done with data collection"
 
-def user_query(k, weighted, similarity_metric, user_data,(query_id,query_features),test_data):
-	knntool = KNN(k, weighted, similarity_metric, user_data,(query_id,query_features))
-	recommended_songs =  map(lambda x:x+1, knntool.run()) # translate shifted id to real id 	
-	print recommended_songs	
+def print_songs(song_index_list):
+	for song in song_index_list:
+		print datatool.get_song_info(song)
+		
+def test(recommended_songs, test_data):
 	R = 10
 	R_rel = 0
-	print "songs match:"
+	print "\n================ Songs match: ====================="
 	for song in recommended_songs:
 		if song in test_data:
 			R_rel += 1
 			print datatool.get_song_info(song)
-	P = R_rel/R	
-	print "P = %f" % P
+	print "P = %f" %  (R_rel/R)	
 
+def user_query(k, weighted, similarity_metric, user_data,(query_id,query_features)):
+	knntool = KNN(k, weighted, similarity_metric, user_data,(query_id,query_features))
+	recommended_songs =  map(lambda x:x+1, knntool.run()) # translate shifted id to real id 	
+	print "\n=============== Most played songs ================="
+	print_songs(knntool.most_frequent())
+	print "\n=============== Recommended songs: ================"
+	print recommended_songs
+	print_songs(recommended_songs)	
+	return recommended_songs
+	
+	
 def artist_query(artist):
 	song_list = datatool.get_artist_collection(artist)
-	query_features, picked_songs = datatool.create_artist_feature(song_list)
+	query_features = datatool.create_artist_feature(song_list)
 	query_data = (-1, query_features)
-	test_data = filter(lambda x:x not in picked_songs, song_list)
-	user_query(k, weighted, similarity_metric, user_data,query_data,test_data)
+	user_query(k, weighted, similarity_metric, user_data, query_data)
 	
 
 print "Start training..."
@@ -64,8 +74,9 @@ print "Start training..."
 if query_id is not None:
 	print "User query..."
 	test_data = datatool.test_data[query_id-1]
-	user_query(k, weighted, similarity_metric, user_data, (query_id-1,user_data[query_id-1]),test_data)
-
+	rec = user_query(k, weighted, similarity_metric, user_data, (query_id-1,user_data[query_id-1]))
+	test(rec, test_data)
+	
 # artist query
 if artist is not None:
 	print "Artist query..."

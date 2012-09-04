@@ -64,9 +64,9 @@ class DataTool(object):
 		
 	def create_artist_feature(self,song_list):
 		features = zeros(self.num_songs)
-		for song_id in song_list[:NUM_PICK]:
+		for song_id in song_list:
 			features[song_id-1] = 1
-		return features, song_list[:NUM_PICK] 	# real song id for song_list
+		return features
 		
 	def get_song_info(self, id):
 		return self.song_info[id-1]

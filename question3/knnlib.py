@@ -77,7 +77,12 @@ class KNN(object):
 		print "ranking_vector:"
 		print self.ranking_vector
 		print"++++++++++++++++++++++++++++++++++++"
-		
+	
+	def most_frequent(self):
+		raw = enumerate(self.query_user_features)
+		raw = nlargest(NUM_PICK, raw, key=lambda x: x[1])
+		return map(lambda x: x[0],raw)[:NUM_PICK]
+	
 	def run(self):
 		self._reset()
 #		self.print_attr()
